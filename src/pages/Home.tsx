@@ -1,185 +1,339 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import Map from '../components/Map';
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
+import Map, { MAP_STYLES } from '../components/Map';
 import SearchBar from '../components/SearchBar';
 import ThemeToggle from '../components/ThemeToggle';
 import MarkerActions from '../components/MarkerActions';
 import { defaultMarkers } from '../data/markers';
 import { MarkerData } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
-interface HomeProps {
-  toggleTheme: () => void;
-  isDarkTheme: boolean;
-}
+const Home: React.FC = () => {
+  const [markers, setMarkers] = useState<any[]>([]);
+  const [mapCenter, setMapCenter] = useState<[number, number]>([-23.5505, -46.6333]); // São Paulo como padrão
+  const [mapZoom, setMapZoom] = useState(13);
+  const [currentMapStyle, setCurrentMapStyle] = useState('STANDARD');
+  const [isMapReady, setIsMapReady] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
 
-const Home: React.FC<HomeProps> = ({ toggleTheme, isDarkTheme }) => {
-  const [markers, setMarkers] = useState<MarkerData[]>(defaultMarkers);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([-14.2350, -51.9253]); // Centro do Brasil
-  const [mapZoom, setMapZoom] = useState(4);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMapReady(true);
+    }, 500);
+
+    const bannerTimer = setTimeout(() => {
+      setShowBanner(false);
+    }, 5000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(bannerTimer);
+    };
+  }, []);
 
   const handleLocationSelect = (lat: number, lon: number, name: string) => {
     setMapCenter([lat, lon]);
-    setMapZoom(13);
+    setMapZoom(15);
 
-    // Verificar se já existe um marcador com este nome
-    const exists = markers.some(marker => 
-      marker.lat === lat && marker.lng === lon
+    const existingMarker = markers.find(
+      (marker) => marker.position[0] === lat && marker.position[1] === lon
     );
 
-    if (!exists) {
-      const newMarker: MarkerData = {
-        id: `marker-${Date.now()}`,
-        lat,
-        lng: lon,
-        title: name.split(',')[0],
-        description: name,
-        type: 'highlight'
-      };
-      
-      setMarkers(prev => [...prev, newMarker]);
+    if (!existingMarker) {
+      setMarkers((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          position: [lat, lon] as [number, number],
+          description: name,
+        },
+      ]);
     }
   };
 
   const handleMapClick = (lat: number, lng: number) => {
-    console.log(`Clicou em: Lat ${lat}, Lng ${lng}`);
+    console.log(`Clique no mapa em: ${lat}, ${lng}`);
   };
 
-  const handleMarkersImport = (importedMarkers: MarkerData[]) => {
-    setMarkers(prev => [...prev, ...importedMarkers]);
+  const handleMarkersImport = (importedMarkers: any[]) => {
+    setMarkers((prev) => [...prev, ...importedMarkers]);
   };
   
   const handleLocationFound = (lat: number, lng: number) => {
     setMapCenter([lat, lng]);
     setMapZoom(16);
     
-    // Adicionar um marcador na localização do usuário
-    const newMarker: MarkerData = {
-      id: `my-location-${Date.now()}`,
-      lat,
-      lng,
-      title: 'Minha Localização',
-      description: `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`,
-      type: 'highlight'
+    const userLocationMarker = {
+      id: 'user-location',
+      position: [lat, lng] as [number, number],
+      description: 'Sua localização atual',
     };
-    
-    setMarkers(prev => [...prev, newMarker]);
+
+    setMarkers((prev) => {
+      const withoutUserLocation = prev.filter((marker) => marker.id !== 'user-location');
+      return [...withoutUserLocation, userLocationMarker];
+    });
   };
 
   return (
-    <PageContainer>
-      <Header>
-        <Logo>🗺️ Geo-Styled</Logo>
-        <ControlsContainer>
+    <HomeContainer>
+      {showBanner && (
+        <WelcomeBanner>
+          <BannerContent>
+            <h2>Bem-vindo ao Geo-Styled! 🌎</h2>
+            <p>Explore mapas interativos com um visual incrível. Use a barra de pesquisa para encontrar locais ou clique no botão de localização.</p>
+            <CloseButton onClick={() => setShowBanner(false)}>×</CloseButton>
+          </BannerContent>
+        </WelcomeBanner>
+      )}
+      
+      <GradientOverlay isMapReady={isMapReady} />
+      
+      <ContentContainer>
+        <Header>
+          <Logo>Geo-Styled</Logo>
           <SearchBarContainer>
             <SearchBar onLocationSelect={handleLocationSelect} />
           </SearchBarContainer>
-          <ThemeToggle toggleTheme={toggleTheme} isDarkTheme={isDarkTheme} />
-        </ControlsContainer>
-      </Header>
-      <ActionsBar>
-        <MarkerActions markers={markers} onImport={handleMarkersImport} />
-        <MarkerCount>{markers.length} marcadores</MarkerCount>
-      </ActionsBar>
-      <MapContainer>
-        <Map 
-          markers={markers} 
-          center={mapCenter} 
-          zoom={mapZoom} 
-          onMapClick={handleMapClick}
-          isDarkTheme={isDarkTheme}
-          onLocationFound={handleLocationFound}
-        />
-      </MapContainer>
-      <Footer>
-        <FooterText>
-          Geo-Styled &copy; {new Date().getFullYear()} | 
-          Desenvolvido com React, Leaflet e Styled Components
-        </FooterText>
-      </Footer>
-    </PageContainer>
+        </Header>
+        
+        <MapContainer>
+          <Map
+            center={mapCenter}
+            zoom={mapZoom}
+            markers={markers}
+            onMapClick={handleMapClick}
+            onLocationFound={handleLocationFound}
+            onStyleChange={(style) => setCurrentMapStyle(style)}
+          />
+        </MapContainer>
+        
+        <ActionsBar>
+          <ActionInfo>
+            <ActionLabel>Marcadores</ActionLabel>
+            <ActionValue>{markers.length}</ActionValue>
+          </ActionInfo>
+          <ActionInfo>
+            <ActionLabel>Estilo</ActionLabel>
+            <ActionValue>{MAP_STYLES[currentMapStyle as keyof typeof MAP_STYLES].light.name}</ActionValue>
+          </ActionInfo>
+        </ActionsBar>
+      </ContentContainer>
+    </HomeContainer>
   );
 };
 
-const PageContainer = styled.div`
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const slideUp = keyframes`
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+const HomeContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 0;
+  position: relative;
   background-color: ${({ theme }) => theme.background};
+  transition: background-color 0.3s ease;
+`;
+
+const GradientOverlay = styled.div<{ isMapReady: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    ${({ theme }) => `${theme.accent}05`} 0%,
+    transparent 50%,
+    ${({ theme }) => `${theme.accent}08`} 100%
+  );
+  opacity: ${({ isMapReady }) => (isMapReady ? 1 : 0)};
+  transition: opacity 1s ease;
+  z-index: 0;
+`;
+
+const ContentContainer = styled.div`
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 20px;
+  z-index: 1;
+  animation: ${fadeIn} 0.5s ease-out;
 `;
 
 const Header = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
-  background-color: ${({ theme }) => theme.headerBg};
-  box-shadow: ${({ theme }) => theme.shadow};
+  width: 100%;
   z-index: 100;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-  }
+  animation: ${slideUp} 0.5s ease-out;
 `;
 
 const Logo = styled.h1`
-  margin: 0;
-  font-size: 24px;
+  font-size: 28px;
+  font-weight: 700;
   color: ${({ theme }) => theme.accent};
-`;
-
-const ControlsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.5px;
 
   @media (max-width: 768px) {
-    width: 100%;
+    font-size: 24px;
   }
 `;
 
 const SearchBarContainer = styled.div`
-  width: 400px;
+  flex: 1;
+  max-width: 500px;
+  margin-left: 20px;
 
   @media (max-width: 768px) {
-    width: 100%;
+    max-width: 70%;
   }
+`;
+
+const MapContainer = styled.div`
+  width: 100%;
+  height: 70vh;
+  min-height: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: ${({ theme }) => theme.shadow};
+  animation: ${fadeIn} 0.7s ease-out;
+  transition: box-shadow 0.3s ease;
+  position: relative;
+  z-index: 1;
 `;
 
 const ActionsBar = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 24px;
-  background-color: ${({ theme }) => theme.headerBg};
-  border-bottom: 1px solid ${({ theme }) => theme.border};
+  justify-content: flex-start;
+  gap: 24px;
+  margin-top: 16px;
+  animation: ${slideUp} 0.5s 0.3s both;
 `;
 
-const MarkerCount = styled.div`
-  font-size: 14px;
-  color: ${({ theme }) => theme.text};
-`;
-
-const MapContainer = styled.main`
-  flex: 1;
-  padding: 24px;
-  min-height: 550px;
+const ActionInfo = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 20px;
+  background-color: ${({ theme }) => theme.cardBg};
+  border-radius: 12px;
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.cardHoverShadow};
+  }
 `;
 
-const Footer = styled.footer`
-  padding: 16px 24px;
-  background-color: ${({ theme }) => theme.headerBg};
-  text-align: center;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-`;
-
-const FooterText = styled.p`
-  margin: 0;
+const ActionLabel = styled.span`
   font-size: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.text}99;
+`;
+
+const ActionValue = styled.span`
+  font-size: 16px;
+  font-weight: 600;
   color: ${({ theme }) => theme.text};
+`;
+
+const WelcomeBanner = styled.div`
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  width: calc(100% - 40px);
+  max-width: 800px;
+  animation: ${slideUp} 0.5s ease-out, ${fadeIn} 0.5s ease-out;
+`;
+
+const BannerContent = styled.div`
+  background: ${({ theme }) => theme.primaryGradient};
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  h2 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+  }
+  
+  p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 15px;
+    max-width: 90%;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+  }
 `;
 
 export default Home; 

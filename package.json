@@ -14,12 +14,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/uuid": "^10.0.0",
     "axios": "^1.8.4",
     "leaflet": "^1.9.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-leaflet": "^5.0.0",
-    "styled-components": "^6.1.17"
+    "styled-components": "^6.1.17",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.17",

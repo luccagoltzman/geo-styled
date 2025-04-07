@@ -7,9 +7,15 @@ export const lightTheme = {
   popupBg: '#ffffff',
   cardBg: '#ffffff',
   mapBg: '#f0f7ff',
-  shadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+  shadow: '0 4px 10px rgba(0, 0, 0, 0.07)',
   inputBg: '#ffffff',
   headerBg: '#ffffff',
+  backgroundPattern: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232b6cb0' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+  cardHoverShadow: '0 10px 25px rgba(0, 0, 0, 0.12)',
+  cardTransition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+  buttonHoverBg: '#2463a3',
+  primaryGradient: 'linear-gradient(135deg, #2b6cb0 0%, #4299e1 100%)',
+  secondaryGradient: 'linear-gradient(135deg, #f9f9f9 0%, #e2e8f0 100%)',
 };
 
 export const darkTheme = {
@@ -21,9 +27,15 @@ export const darkTheme = {
   popupBg: '#2a2a2a',
   cardBg: '#2a2a2a',
   mapBg: '#1a202c',
-  shadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+  shadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
   inputBg: '#2a2a2a',
   headerBg: '#1a1a1a',
+  backgroundPattern: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2363b3ed' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+  cardHoverShadow: '0 10px 25px rgba(0, 0, 0, 0.4)',
+  cardTransition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+  buttonHoverBg: '#4a8fcf',
+  primaryGradient: 'linear-gradient(135deg, #4a8fcf 0%, #63b3ed 100%)',
+  secondaryGradient: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
 };
 
 export type ThemeType = typeof lightTheme; 
