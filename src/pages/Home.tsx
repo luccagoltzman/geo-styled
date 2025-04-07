@@ -47,6 +47,23 @@ const Home: React.FC<HomeProps> = ({ toggleTheme, isDarkTheme }) => {
   const handleMarkersImport = (importedMarkers: MarkerData[]) => {
     setMarkers(prev => [...prev, ...importedMarkers]);
   };
+  
+  const handleLocationFound = (lat: number, lng: number) => {
+    setMapCenter([lat, lng]);
+    setMapZoom(16);
+    
+    // Adicionar um marcador na localização do usuário
+    const newMarker: MarkerData = {
+      id: `my-location-${Date.now()}`,
+      lat,
+      lng,
+      title: 'Minha Localização',
+      description: `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`,
+      type: 'highlight'
+    };
+    
+    setMarkers(prev => [...prev, newMarker]);
+  };
 
   return (
     <PageContainer>
@@ -69,6 +86,8 @@ const Home: React.FC<HomeProps> = ({ toggleTheme, isDarkTheme }) => {
           center={mapCenter} 
           zoom={mapZoom} 
           onMapClick={handleMapClick}
+          isDarkTheme={isDarkTheme}
+          onLocationFound={handleLocationFound}
         />
       </MapContainer>
       <Footer>
