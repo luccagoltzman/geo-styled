@@ -128,6 +128,20 @@ const SearchBarContainer = styled.div`
   }
 `;
 
+const ActionsBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  background-color: ${({ theme }) => theme.headerBg};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
+`;
+
+const MarkerCount = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.text};
+`;
+
 const MapContainer = styled.main`
   flex: 1;
   padding: 24px;
