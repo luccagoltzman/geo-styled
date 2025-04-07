@@ -145,7 +145,9 @@ const MarkerCount = styled.div`
 const MapContainer = styled.main`
   flex: 1;
   padding: 24px;
-  min-height: 500px;
+  min-height: 550px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Footer = styled.footer`

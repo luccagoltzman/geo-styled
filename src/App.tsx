@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from './styles/theme';
 import { GlobalStyle } from './styles/GlobalStyle';
@@ -10,6 +10,15 @@ const App: React.FC = () => {
   const toggleTheme = () => {
     setIsDarkTheme((prevTheme) => !prevTheme);
   };
+
+  // Aplicar classe ao body para ajudar com alguns estilos CSS
+  useEffect(() => {
+    if (isDarkTheme) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }, [isDarkTheme]);
 
   return (
     <ThemeProvider theme={isDarkTheme ? darkTheme : lightTheme}>

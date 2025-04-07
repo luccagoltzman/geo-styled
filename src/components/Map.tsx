@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import styled from 'styled-components';
 import { MarkerData } from '../types';
 import CustomMarker from './CustomMarker';
+import 'leaflet/dist/leaflet.css';
 
 interface MapProps {
   markers: MarkerData[];
@@ -42,6 +43,7 @@ const Map: React.FC<MapProps> = ({ markers, center, zoom, onMapClick }) => {
         center={center} 
         zoom={zoom} 
         style={{ height: '100%', width: '100%' }}
+        scrollWheelZoom={true}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -59,7 +61,7 @@ const Map: React.FC<MapProps> = ({ markers, center, zoom, onMapClick }) => {
 };
 
 const MapWrapper = styled.div`
-  height: 100%;
+  height: 500px;
   width: 100%;
   border-radius: 12px;
   overflow: hidden;
@@ -67,6 +69,8 @@ const MapWrapper = styled.div`
   border: 1px solid ${({ theme }) => theme.border};
 
   .leaflet-container {
+    height: 100%;
+    width: 100%;
     background-color: ${({ theme }) => theme.mapBg};
   }
 

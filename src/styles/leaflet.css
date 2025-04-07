@@ -1,1 +1,35 @@
-/* Arquivo para importar os estilos do Leaflet */ 
+/* Arquivo para importar os estilos do Leaflet */
+
+/* Correções para o mapa */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Correção para os ícones */
+.leaflet-default-icon-path {
+  background-image: url(https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png);
+}
+
+/* Estilo personalizado para popups */
+.leaflet-popup-content-wrapper {
+  background-color: var(--popup-bg);
+  color: var(--text-color);
+  border-radius: 8px;
+}
+
+.leaflet-popup-tip {
+  background-color: var(--popup-bg);
+}
+
+/* Variáveis CSS para temas (serão substituídas pelo ThemeProvider do Styled Components) */
+:root {
+  --popup-bg: #ffffff;
+  --text-color: #1a1a1a;
+}
+
+/* Para tema escuro, aplicado via JavaScript */
+.dark-theme {
+  --popup-bg: #2a2a2a;
+  --text-color: #f1f1f1;
+} 
